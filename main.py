@@ -31,9 +31,9 @@ for country_code in countries.keys():
     for country, rank in zip(tree.xpath(xpaths['country_name']), tree.xpath(xpaths['televoting_rank'])):
         country_code = list(countries.keys())[list(countries.values()).index(str(country).strip())]
         try:
-            results[country_code] += points[int(rank) - 1]  # ranks starts from 1 to n
+            results[country_code] += points[int(rank) - 1]  # Ranks starts from 1 to n
         except IndexError as e:
-            pass  # Country don't get any points
+            pass  # Country doesn't get any points
 
 for i, country_code in enumerate(sorted(results, key=results.get, reverse=True)):
     print(i + 1, countries[country_code], "-", results[country_code])
