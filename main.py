@@ -1,39 +1,62 @@
 #!/usr/bin/env python3
-#-*-coding: utf-8-*-
-
+# -*-coding: utf-8-*-
+from operator import itemgetter
 from collections import defaultdict
-from lxml import html
 import requests
+import lxml.html
 
-url = "http://www.eurovision.tv/page/results"
-event_id = 1893  # Eurovision Song Contest 2014 Grand Final
-xpaths = {"country_name": '//*[@id="content-wrap"]/div[2]/div/div/div[6]/div/table/tbody/tr[*]/td[1]/text()',
-          "televoting_rank": '//*[@id="content-wrap"]/div[2]/div/div/div[6]/div/table/tbody/tr[*]/td[9]/text()'
-          }
 
-points = [12, 10, 8, 7, 6, 5, 4, 3, 2, 1]
-results = defaultdict(int)
-countries = {"AL": "Albania", "AM": "Armenia", "AT": "Austria", "AZ": "Azerbaijan", "BY": "Belarus",
-             "BE": "Belgium", "DK": "Denmark", "EE": "Estonia", "MK": "F.Y.R. Macedonia",
-             "FI": "Finland", "FR": "France", "GE": "Georgia", "DE": "Germany", "GR": "Greece",
-             "HU": "Hungary", "IS": "Iceland", "IE": "Ireland", "IL": "Israel", "IT": "Italy",
-             "LV": "Latvia", "LT": "Lithuania", "MT": "Malta", "MD": "Moldova", "ME": "Montenegro",
-             "NO": "Norway", "PL": "Poland", "PT": "Portugal", "RO": "Romania", "RU": "Russia",
-             "SM": "San Marino", "SI": "Slovenia", "ES": "Spain", "SE": "Sweden", "CH": "Switzerland",
-             "NL": "The Netherlands", "UA": "Ukraine", "GB": "United Kingdom"
-             }
+URL = 'http://www.eurovision.tv/page/results'
+EVENT_ID = 1893  # Eurovision Song Contest 2014 Grand Final
+COUNTRY_COLUMN = 1
+TELEVOTING_COLUMN = 9
+XPATH = ('//*[@id="content"]/div[2]/div/div/div[6]/div/'
+         'table/tbody/tr[*]/td[{column}]/text()')
 
-for country_code in countries.keys():
-    page = requests.get(url, params={"event": event_id, "voter": country_code})
-    print("[FETCH]", countries[country_code], page.url)
+COUNTRIES = ('AL', 'AM', 'AT', 'AZ', 'BY', 'BE', 'DK', 'EE', 'MK',
+             'FI', 'FR', 'GE', 'DE', 'GR', 'HU', 'IS', 'IE', 'IL',
+             'IT', 'LV', 'LT', 'MT', 'MD', 'ME', 'NO', 'PL', 'PT',
+             'RO', 'RU', 'SM', 'SI', 'ES', 'SE', 'CH', 'NL', 'UA',
+             'GB')
 
-    tree = html.fromstring(page.text)
-    for country, rank in zip(tree.xpath(xpaths['country_name']), tree.xpath(xpaths['televoting_rank'])):
-        country_code = list(countries.keys())[list(countries.values()).index(str(country).strip())]
-        try:
-            results[country_code] += points[int(rank) - 1]  # Ranks starts from 1 to n
-        except IndexError as e:
-            pass  # Country doesn't get any points
 
-for i, country_code in enumerate(sorted(results, key=results.get, reverse=True)):
-    print(i + 1, countries[country_code], "-", results[country_code])
+def parse_html(func):
+    def wrapper(*args, **kwargs):
+        html = func(*args, **kwargs)
+        dom_tree = lxml.html.fromstring(html)
+        return dom_tree
+    return wrapper
+
+
+@parse_html
+def get_country_page(country_code):
+    params = {'event': EVENT_ID, 'voter': country_code}
+    page = requests.get(URL, params=params)
+    return page.text
+
+
+def get_points(rank, points=(12, 10, 8, 7, 6, 5, 4, 3, 2, 1)):
+    rank = int(rank)
+    return points[rank] if rank < len(points) else 0
+
+
+def get_ranks(dom_tree, column):
+    return dom_tree.xpath(XPATH.format(column=column))
+
+
+def pprint_ranking(ranking):
+    ranking = sorted(ranking.items(), key=itemgetter(1), reverse=True)
+    for position, (country_name, points) in enumerate(ranking, start=1):
+        print('{:3} {} ({})'.format(position, country_name,  points))
+
+if __name__ == '__main__':
+    results = defaultdict(int)
+    for country_code in COUNTRIES:
+        print('Fetching {0} ranking'.format(country_code))
+        country_page = get_country_page(country_code)
+        participiants = get_ranks(country_page, COUNTRY_COLUMN)
+        televoting_ranks = get_ranks(country_page, TELEVOTING_COLUMN)
+        for country_name, rank in zip(participiants, televoting_ranks):
+            results[country_name] += get_points(rank)
+
+    pprint_ranking(results)
