@@ -7,29 +7,29 @@ Ranking
 =========
 Rank | Country | Points
 -----|---------|--------
-1 | **Austria** | 296
-2 | **The Netherlands** | 220
-3 | **Poland** | 184
-4 | Armenia | 182
-5 | Sweden | 171
-6 | Russia | 124
-7 | Switzerland | 113
-8 | Ukraine | 111
-9 | Romania | 108
-10 |Hungary | 83
-11 | Belarus | 69
-12 | Greece | 51
-13 | Norway | 51
-14 |Iceland | 46
-15 | Denmark | 42
-16 | Montenegro | 42
-17 | Finland | 36
-18 | Spain | 29
-19 | Italy | 22
-20 | Germany | 22
-21 | United Kingdom | 21
-22 | Azerbaijan | 18
-23 | San Marino | 15
-24 | Slovenia | 15
-25 | Malta | 12
-26 | France | 1
+1 | **Austria** | 254
+2 | **The Netherlands** | 178
+3 | **Armenia** | 157
+4 | Poland | 151
+5 | Sweden | 139
+6 | Russia | 107
+7 | Ukraine | 95
+8 | Romania | 86
+9 | Switzerland | 84
+10| Hungary | 61
+11| Belarus | 55
+12| Greece | 42
+13| Norway | 36
+14| Iceland | 35
+15| Montenegro | 35
+16| Denmark | 30
+17| Finland | 28
+18| Spain | 22
+19| Germany | 21
+20| Azerbaijan | 20
+21| United Kingdom | 19
+22| Italy | 17
+23| Slovenia | 12
+24| San Marino | 8
+25| Malta | 8
+26| France | 0
